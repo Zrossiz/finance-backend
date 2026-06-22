@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -12,8 +11,6 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
-
-var errInvalidLoginOrPassword error = errors.New("invalid login or password")
 
 type user struct {
 	pgUser IUserRepo
@@ -43,7 +40,7 @@ func newUser(pgUser IUserRepo, jwtAccessSecret string, jwtRefreshSecret string) 
 
 func (u *user) Registration(ctx context.Context, username, password string) (string, string, error) {
 	existUser, err := u.pgUser.GetByUsername(ctx, username)
-	if err != nil {
+	if err != nil && err != apperrors.ErrNotFound {
 		return "", "", err
 	}
 
@@ -83,7 +80,7 @@ func (u *user) Login(ctx context.Context, username, password string) (string, st
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", "", errInvalidLoginOrPassword
+		return "", "", apperrors.ErrInvalidLoginOrPassword
 	}
 
 	access, refresh, err := u.generateTokens(user)

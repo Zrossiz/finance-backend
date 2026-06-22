@@ -14,9 +14,11 @@ type Config struct {
 	} `yaml:"app"`
 
 	Server struct {
-		Addr             string `yaml:"addr"`
-		JWTAccessSecret  string `yaml:"jwt_access_secret"`
-		JWTRefreshSecret string `yaml:"jwt_refresh_secret"`
+		Addr               string `yaml:"addr"`
+		JWTAccessSecret    string `yaml:"jwt_access_secret"`
+		JWTRefreshSecret   string `yaml:"jwt_refresh_secret"`
+		JWTAccessLifetime  int    `yaml:"jwt_access_lifetime"`
+		JWTRefreshLifetime int    `yaml:"jwt_refresh_lifetime"`
 	} `yaml:"server"`
 
 	Postgres struct {

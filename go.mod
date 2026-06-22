@@ -5,6 +5,7 @@ go 1.25.4
 require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
+	github.com/go-chi/chi/v5 v5.3.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/golang-migrate/migrate/v4 v4.19.1 // indirect

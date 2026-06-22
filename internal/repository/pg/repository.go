@@ -6,12 +6,12 @@ import (
 )
 
 type Postgres struct {
-	User          *user
-	Stock         *stock
-	Bond          *bond
-	BankDeposit   *bankDeposit
-	CryptoPostion *cryptoPosition
-	RealEstate    *realEstate
+	User           *user
+	Stock          *stock
+	Bond           *bond
+	BankDeposit    *bankDeposit
+	CryptoPosition *cryptoPosition
+	RealEstate     *realEstate
 }
 
 func Connect(uri string) (*sql.DB, error) {
@@ -28,13 +28,13 @@ func Connect(uri string) (*sql.DB, error) {
 	return conn, nil
 }
 
-func NewRepository(conn *sql.DB) *Postgres {
+func New(conn *sql.DB) *Postgres {
 	return &Postgres{
-		User:          newUser(conn),
-		Stock:         newStock(conn),
-		RealEstate:    newRealEstate(conn),
-		CryptoPostion: newCryptoPosition(conn),
-		Bond:          newBond(conn),
-		BankDeposit:   newBankDeposit(conn),
+		User:           newUser(conn),
+		Stock:          newStock(conn),
+		RealEstate:     newRealEstate(conn),
+		CryptoPosition: newCryptoPosition(conn),
+		Bond:           newBond(conn),
+		BankDeposit:    newBankDeposit(conn),
 	}
 }

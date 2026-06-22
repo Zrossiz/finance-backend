@@ -1,0 +1,101 @@
+package handler
+
+import (
+	"net/http"
+
+	"github.com/Zrossiz/finance-backend/internal/apperrors"
+	"github.com/Zrossiz/finance-backend/internal/config"
+	"github.com/go-chi/chi/v5"
+	"github.com/sirupsen/logrus"
+)
+
+type user struct {
+	userSrv IUserService
+	cfg     *config.Config
+}
+
+func newUser(userSrv IUserService, cfg *config.Config) *user {
+	return &user{userSrv: userSrv, cfg: cfg}
+}
+
+func (u *user) registerRoutes(r chi.Router) {
+	r.Post("/users/login", u.login)
+	r.Post("/users/registration", u.registration)
+}
+
+func (u *user) registration(rw http.ResponseWriter, r *http.Request) {
+	body, err := parseJSONBody[createUserDTO](r)
+	if err != nil {
+		Error(rw, ErrBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	access, refresh, err := u.userSrv.Registration(r.Context(), body.Username, body.Password)
+	if err != nil {
+		if err == apperrors.ErrAlreadyExist {
+			Error(rw, HTTPError{Code: http.StatusBadRequest, Message: "user already exist"})
+			return
+		}
+
+		logrus.Errorf("registration user err: %v", err)
+		Error(rw, ErrInternalServerError)
+		return
+	}
+
+	u.setCookieTokens(rw, access, refresh)
+
+	rw.WriteHeader(http.StatusCreated)
+}
+
+func (u *user) login(rw http.ResponseWriter, r *http.Request) {
+	body, err := parseJSONBody[loginUserDTO](r)
+	if err != nil {
+		Error(rw, ErrBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	access, refresh, err := u.userSrv.Login(r.Context(), body.Username, body.Password)
+	if err != nil {
+		if err == apperrors.ErrInvalidLoginOrPassword {
+			Error(rw, HTTPError{Code: http.StatusBadRequest, Message: err.Error()})
+			return
+		}
+
+		logrus.Errorf("registration user err: %v", err)
+		Error(rw, ErrInternalServerError)
+		return
+	}
+
+	u.setCookieTokens(rw, access, refresh)
+
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (u *user) setCookieTokens(rw http.ResponseWriter, access, refresh string) {
+	secure := false
+	if u.cfg.App.ENV == "prod" {
+		secure = true
+	}
+
+	http.SetCookie(rw, &http.Cookie{
+		Name:     "access_token",
+		Value:    access,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+		MaxAge:   u.cfg.Server.JWTAccessLifetime,
+	})
+
+	http.SetCookie(rw, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refresh,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+		MaxAge:   u.cfg.Server.JWTRefreshLifetime,
+	})
+}

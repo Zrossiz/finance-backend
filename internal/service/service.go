@@ -70,7 +70,7 @@ type Postgres struct {
 	CryptoPosition ICryptoPositionRepo
 }
 
-func NewService(pgRepo Postgres, cfg *config.Config) *Service {
+func New(pgRepo Postgres, cfg *config.Config) *Service {
 	return &Service{
 		User:           newUser(pgRepo.User, cfg.Server.JWTAccessSecret, cfg.Server.JWTRefreshSecret),
 		Stock:          newStock(pgRepo.Stock),

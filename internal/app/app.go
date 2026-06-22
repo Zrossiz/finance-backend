@@ -11,8 +11,10 @@ import (
 	"syscall"
 
 	"github.com/Zrossiz/finance-backend/internal/config"
+	"github.com/Zrossiz/finance-backend/internal/handler"
 	pgrepo "github.com/Zrossiz/finance-backend/internal/repository/pg"
 	"github.com/Zrossiz/finance-backend/internal/service"
+	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -47,11 +49,6 @@ func New() (*App, error) {
 	)
 	app.ErrGroup, app.Context = errgroup.WithContext(app.Context)
 
-	app.server = http.Server{
-		Addr:    cfg.Server.Addr,
-		Handler: nil,
-	}
-
 	app.conn, err = pgrepo.Connect(fmt.Sprintf(
 		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.Postgres.User,
@@ -64,15 +61,33 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	pgRepo := pgrepo.NewRepository(app.conn)
-	service.NewService(service.Postgres{
+	pgRepo := pgrepo.New(app.conn)
+
+	srv := service.New(service.Postgres{
 		User:           pgRepo.User,
 		RealEstate:     pgRepo.RealEstate,
-		CryptoPosition: pgRepo.CryptoPostion,
+		CryptoPosition: pgRepo.CryptoPosition,
 		Bond:           pgRepo.Bond,
 		Stock:          pgRepo.Stock,
 		BankDeposit:    pgRepo.BankDeposit,
 	}, cfg)
+
+	r := chi.NewRouter()
+
+	httpHandler := handler.New(handler.Service{
+		User:           srv.User,
+		RealEstate:     srv.RealEstate,
+		CryptoPosition: srv.CryptoPosition,
+		Bond:           srv.Bond,
+		Stock:          srv.Stock,
+		BankDeposit:    srv.BankDeposit,
+	}, cfg)
+	httpHandler.RegisterRoutes(r)
+
+	app.server = http.Server{
+		Addr:    cfg.Server.Addr,
+		Handler: r,
+	}
 
 	return app, nil
 }
