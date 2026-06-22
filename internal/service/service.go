@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Zrossiz/finance-backend/internal/config"
 	"github.com/Zrossiz/finance-backend/internal/domain"
@@ -70,13 +71,18 @@ type Postgres struct {
 	CryptoPosition ICryptoPositionRepo
 }
 
-func New(pgRepo Postgres, cfg *config.Config) *Service {
+func New(pgRepo Postgres, cfg *config.Config) (*Service, error) {
+	userSrv, err := newUser(pgRepo.User, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("init user service err: %w", err)
+	}
+
 	return &Service{
-		User:           newUser(pgRepo.User, cfg.Server.JWTAccessSecret, cfg.Server.JWTRefreshSecret),
+		User:           userSrv,
 		Stock:          newStock(pgRepo.Stock),
 		BankDeposit:    newBankDeposit(pgRepo.BankDeposit),
 		Bond:           newBond(pgRepo.Bond),
 		RealEstate:     newRealEstate(pgRepo.RealEstate),
 		CryptoPosition: newCryptoPosition(pgRepo.CryptoPosition),
-	}
+	}, nil
 }

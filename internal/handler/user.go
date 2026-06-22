@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Zrossiz/finance-backend/internal/apperrors"
 	"github.com/Zrossiz/finance-backend/internal/config"
@@ -11,11 +12,29 @@ import (
 
 type user struct {
 	userSrv IUserService
-	cfg     *config.Config
+
+	appENV             string
+	jwtAccessLifetime  int
+	jwtRefreshLifetime int
 }
 
-func newUser(userSrv IUserService, cfg *config.Config) *user {
-	return &user{userSrv: userSrv, cfg: cfg}
+func newUser(userSrv IUserService, cfg *config.Config) (*user, error) {
+	accessDuration, err := time.ParseDuration(cfg.Server.JWTAccessLifetime)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshDuration, err := time.ParseDuration(cfg.Server.JWTRefreshLifetime)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user{
+		userSrv:            userSrv,
+		appENV:             cfg.App.ENV,
+		jwtAccessLifetime:  int(accessDuration.Seconds()),
+		jwtRefreshLifetime: int(refreshDuration.Seconds()),
+	}, nil
 }
 
 func (u *user) registerRoutes(r chi.Router) {
@@ -75,7 +94,7 @@ func (u *user) login(rw http.ResponseWriter, r *http.Request) {
 
 func (u *user) setCookieTokens(rw http.ResponseWriter, access, refresh string) {
 	secure := false
-	if u.cfg.App.ENV == "prod" {
+	if u.appENV == "prod" {
 		secure = true
 	}
 
@@ -86,7 +105,7 @@ func (u *user) setCookieTokens(rw http.ResponseWriter, access, refresh string) {
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
-		MaxAge:   u.cfg.Server.JWTAccessLifetime,
+		MaxAge:   u.jwtAccessLifetime,
 	})
 
 	http.SetCookie(rw, &http.Cookie{
@@ -96,6 +115,6 @@ func (u *user) setCookieTokens(rw http.ResponseWriter, access, refresh string) {
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
-		MaxAge:   u.cfg.Server.JWTRefreshLifetime,
+		MaxAge:   u.jwtRefreshLifetime,
 	})
 }

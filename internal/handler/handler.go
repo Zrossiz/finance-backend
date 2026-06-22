@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Zrossiz/finance-backend/internal/config"
 	"github.com/Zrossiz/finance-backend/internal/domain"
@@ -63,17 +64,25 @@ type Service struct {
 }
 
 type Handler struct {
-	user *user
+	user           *user
+	cryptoPosition *cryptoPosition
 }
 
-func New(srv Service, cfg *config.Config) *Handler {
-	return &Handler{
-		user: newUser(srv.User, cfg),
+func New(srv Service, cfg *config.Config) (*Handler, error) {
+	userHandler, err := newUser(srv.User, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("init user handler err: %w", err)
 	}
+
+	return &Handler{
+		user:           userHandler,
+		cryptoPosition: newCryptoPosition(srv.CryptoPosition),
+	}, nil
 }
 
 func (h *Handler) RegisterRoutes(router chi.Router) {
 	router.Route("/api/v1", func(r chi.Router) {
 		h.user.registerRoutes(r)
+		h.cryptoPosition.registerRoutes(r)
 	})
 }

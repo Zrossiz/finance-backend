@@ -63,7 +63,7 @@ func New() (*App, error) {
 
 	pgRepo := pgrepo.New(app.conn)
 
-	srv := service.New(service.Postgres{
+	srv, err := service.New(service.Postgres{
 		User:           pgRepo.User,
 		RealEstate:     pgRepo.RealEstate,
 		CryptoPosition: pgRepo.CryptoPosition,
@@ -71,10 +71,13 @@ func New() (*App, error) {
 		Stock:          pgRepo.Stock,
 		BankDeposit:    pgRepo.BankDeposit,
 	}, cfg)
+	if err != nil {
+		return nil, err
+	}
 
 	r := chi.NewRouter()
 
-	httpHandler := handler.New(handler.Service{
+	httpHandler, err := handler.New(handler.Service{
 		User:           srv.User,
 		RealEstate:     srv.RealEstate,
 		CryptoPosition: srv.CryptoPosition,
@@ -82,6 +85,10 @@ func New() (*App, error) {
 		Stock:          srv.Stock,
 		BankDeposit:    srv.BankDeposit,
 	}, cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	httpHandler.RegisterRoutes(r)
 
 	app.server = http.Server{

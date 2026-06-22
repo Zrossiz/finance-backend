@@ -4,8 +4,10 @@ app:
 server:
   logger: "debug"
   addr: "0.0.0.0:9000"
+  # seconds
   jwt_access_lifetime: 900      # 15 минут
   jwt_refresh_lifetime: 604800  # 7 дней
+  # ---
 postgres:
   host: "postgres"
   port: 5432

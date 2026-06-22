@@ -6,36 +6,39 @@ import (
 	"time"
 
 	"github.com/Zrossiz/finance-backend/internal/apperrors"
+	"github.com/Zrossiz/finance-backend/internal/config"
 	"github.com/Zrossiz/finance-backend/internal/domain"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/Zrossiz/finance-backend/internal/helpers"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type user struct {
-	pgUser IUserRepo
-
-	jwtAccessSecret  string
-	jwtRefreshSecret string
+	pgUser             IUserRepo
+	jwtAccessSecret    []byte
+	jwtRefreshSecret   []byte
+	jwtAccessLifetime  time.Duration
+	jwtRefreshLifetime time.Duration
 }
 
-const (
-	accessTokenTTL  = 15 * time.Minute
-	refreshTokenTTL = 30 * 24 * time.Hour
-)
-
-type UserClaims struct {
-	UserID   uuid.UUID `json:"user_id"`
-	Username string    `json:"username"`
-	jwt.RegisteredClaims
-}
-
-func newUser(pgUser IUserRepo, jwtAccessSecret string, jwtRefreshSecret string) *user {
-	return &user{
-		pgUser:           pgUser,
-		jwtAccessSecret:  jwtAccessSecret,
-		jwtRefreshSecret: jwtRefreshSecret,
+func newUser(pgUser IUserRepo, cfg *config.Config) (*user, error) {
+	jwtAccessLifetime, err := time.ParseDuration(cfg.Server.JWTAccessLifetime)
+	if err != nil {
+		return nil, err
 	}
+
+	jwtRefreshLifetime, err := time.ParseDuration(cfg.Server.JWTRefreshLifetime)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user{
+		pgUser:             pgUser,
+		jwtAccessSecret:    []byte(cfg.Server.JWTAccessSecret),
+		jwtRefreshSecret:   []byte(cfg.Server.JWTRefreshSecret),
+		jwtAccessLifetime:  jwtAccessLifetime,
+		jwtRefreshLifetime: jwtRefreshLifetime,
+	}, nil
 }
 
 func (u *user) Registration(ctx context.Context, username, password string) (string, string, error) {
@@ -64,7 +67,10 @@ func (u *user) Registration(ctx context.Context, username, password string) (str
 		return "", "", err
 	}
 
-	access, refresh, err := u.generateTokens(&user)
+	access, refresh, err := helpers.GenerateTokens(
+		&user, u.jwtAccessSecret, u.jwtRefreshSecret,
+		u.jwtAccessLifetime, u.jwtRefreshLifetime,
+	)
 	if err != nil {
 		return "", "", err
 	}
@@ -83,47 +89,12 @@ func (u *user) Login(ctx context.Context, username, password string) (string, st
 		return "", "", apperrors.ErrInvalidLoginOrPassword
 	}
 
-	access, refresh, err := u.generateTokens(user)
+	access, refresh, err := helpers.GenerateTokens(
+		user, u.jwtAccessSecret, u.jwtRefreshSecret,
+		u.jwtAccessLifetime, u.jwtRefreshLifetime,
+	)
 	if err != nil {
 		return "", "", err
-	}
-
-	return access, refresh, nil
-}
-
-func (u *user) generateTokens(user *domain.User) (string, string, error) {
-	now := time.Now()
-
-	accessClaims := UserClaims{
-		UserID:   user.ID,
-		Username: user.Username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(accessTokenTTL)),
-			IssuedAt:  jwt.NewNumericDate(now),
-		},
-	}
-
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
-
-	access, err := accessToken.SignedString([]byte(u.jwtAccessSecret))
-	if err != nil {
-		return "", "", fmt.Errorf("sign access token err: %w", err)
-	}
-
-	refreshClaims := UserClaims{
-		UserID:   user.ID,
-		Username: user.Username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(refreshTokenTTL)),
-			IssuedAt:  jwt.NewNumericDate(now),
-		},
-	}
-
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
-
-	refresh, err := refreshToken.SignedString([]byte(u.jwtRefreshSecret))
-	if err != nil {
-		return "", "", fmt.Errorf("sign refresh token err: %w", err)
 	}
 
 	return access, refresh, nil
