@@ -31,7 +31,7 @@ type ICryptoPositionService interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.CryptoPosition, error)
 	GetOneByID(ctx context.Context, id uuid.UUID) (*domain.CryptoPosition, error)
-	Update(ctx context.Context, id uuid.UUID, amount decimal.Decimal, avgPriceUsd int64) error
+	Update(ctx context.Context, id uuid.UUID, amount decimal.Decimal, avgPriceUsd *int64) error
 }
 
 type IRealEstateService interface {
@@ -80,9 +80,9 @@ func New(srv Service, cfg *config.Config) (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) RegisterRoutes(router chi.Router) {
+func (h *Handler) RegisterRoutes(router chi.Router, accessSecret string) {
 	router.Route("/api/v1", func(r chi.Router) {
 		h.user.registerRoutes(r)
-		h.cryptoPosition.registerRoutes(r)
+		h.cryptoPosition.registerRoutes(r, accessSecret)
 	})
 }

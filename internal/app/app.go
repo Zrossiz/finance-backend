@@ -89,7 +89,7 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	httpHandler.RegisterRoutes(r)
+	httpHandler.RegisterRoutes(r, cfg.Server.JWTAccessSecret)
 
 	app.server = http.Server{
 		Addr:    cfg.Server.Addr,

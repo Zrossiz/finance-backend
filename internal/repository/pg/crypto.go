@@ -34,7 +34,7 @@ func (c *cryptoPosition) Create(ctx context.Context, payload domain.CryptoPositi
 
 func (c *cryptoPosition) Update(
 	ctx context.Context, id uuid.UUID,
-	amount decimal.Decimal, avgPriceUsd int64,
+	amount decimal.Decimal, avgPriceUsd *int64,
 ) error {
 	res, err := c.conn.ExecContext(
 		ctx, updateCryptoPositionQuery,

@@ -36,7 +36,7 @@ func (c *cryptoPosition) GetOneByID(ctx context.Context, id uuid.UUID) (*domain.
 
 func (c *cryptoPosition) Update(
 	ctx context.Context, id uuid.UUID,
-	amount decimal.Decimal, avgPriceUsd int64,
+	amount decimal.Decimal, avgPriceUsd *int64,
 ) error {
 	return c.pgCryptoPositon.Update(ctx, id, amount, avgPriceUsd)
 }

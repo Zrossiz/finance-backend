@@ -9,3 +9,14 @@ type loginUserDTO struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type createCryptoPositionDTO struct {
+	Ticker           string `json:"ticker"`
+	Amount           string `json:"amount"`
+	AvgPriceUSDCents *int64 `json:"avg_price_usd_cents"`
+}
+
+type updateCryptoPositionDTO struct {
+	Amount      string `json:"amount"`
+	AvgPriceUSD *int64 `json:"avg_price_usd"`
+}

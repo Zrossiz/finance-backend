@@ -1,11 +1,10 @@
-package middleware
+package handler
 
 import (
 	"context"
 	"net/http"
 
 	"github.com/Zrossiz/finance-backend/internal/domain"
-	"github.com/Zrossiz/finance-backend/internal/handler"
 	"github.com/Zrossiz/finance-backend/internal/helpers"
 )
 
@@ -18,13 +17,13 @@ func JWTAuth(secret []byte) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("access_token")
 			if err != nil {
-				handler.Error(w, handler.ErrUnauthorized)
+				Error(w, ErrUnauthorized)
 				return
 			}
 
 			claims, err := helpers.ValidateJWT(cookie.Value, secret)
 			if err != nil {
-				handler.Error(w, handler.ErrUnauthorized)
+				Error(w, ErrUnauthorized)
 				return
 			}
 

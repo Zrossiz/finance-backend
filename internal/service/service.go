@@ -30,7 +30,7 @@ type ICryptoPositionRepo interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.CryptoPosition, error)
 	GetOneByID(ctx context.Context, id uuid.UUID) (*domain.CryptoPosition, error)
-	Update(ctx context.Context, id uuid.UUID, amount decimal.Decimal, avgPriceUsd int64) error
+	Update(ctx context.Context, id uuid.UUID, amount decimal.Decimal, avgPriceUsd *int64) error
 }
 
 type IRealEstateRepo interface {

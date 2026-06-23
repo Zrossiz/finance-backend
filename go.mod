@@ -2,17 +2,16 @@ module github.com/Zrossiz/finance-backend
 
 go 1.25.4
 
-require github.com/ilyakaznacheev/cleanenv v1.5.0
-
 require (
-	github.com/go-chi/chi/v5 v5.3.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
-	github.com/golang-migrate/migrate/v4 v4.19.1 // indirect
-	github.com/shopspring/decimal v1.4.0 // indirect
-	golang.org/x/crypto v0.53.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
+	github.com/go-chi/chi/v5 v5.3.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
+	github.com/golang-migrate/migrate/v4 v4.19.1
+	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/shopspring/decimal v1.4.0
+	golang.org/x/crypto v0.53.0
 )
+
+require golang.org/x/sys v0.46.0 // indirect
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
