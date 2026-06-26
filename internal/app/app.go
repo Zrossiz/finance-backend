@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/Zrossiz/finance-backend/internal/config"
@@ -15,6 +16,7 @@ import (
 	pgrepo "github.com/Zrossiz/finance-backend/internal/repository/pg"
 	"github.com/Zrossiz/finance-backend/internal/service"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -76,6 +78,28 @@ func New() (*App, error) {
 	}
 
 	r := chi.NewRouter()
+
+	var allowedOrigins []string
+	for _, origin := range strings.Split(cfg.Server.CORSAllowedOrigins, ",") {
+		origin = strings.TrimSpace(origin)
+		if origin != "" {
+			allowedOrigins = append(allowedOrigins, origin)
+		}
+	}
+
+	logrus.Info("allowed origins: ", allowedOrigins)
+
+	if len(allowedOrigins) == 0 {
+		allowedOrigins = []string{"http://localhost:5173"}
+	}
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   allowedOrigins,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 
 	httpHandler, err := handler.New(handler.Service{
 		User:           srv.User,

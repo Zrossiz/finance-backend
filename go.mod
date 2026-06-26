@@ -15,6 +15,7 @@ require golang.org/x/sys v0.46.0 // indirect
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/go-chi/cors v1.2.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/lib/pq v1.12.3

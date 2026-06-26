@@ -77,7 +77,7 @@ func (u *user) login(rw http.ResponseWriter, r *http.Request) {
 
 	access, refresh, err := u.userSrv.Login(r.Context(), body.Username, body.Password)
 	if err != nil {
-		if err == apperrors.ErrInvalidLoginOrPassword {
+		if err == apperrors.ErrInvalidLoginOrPassword || err == apperrors.ErrNotFound {
 			Error(rw, HTTPError{Code: http.StatusBadRequest, Message: err.Error()})
 			return
 		}

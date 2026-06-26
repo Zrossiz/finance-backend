@@ -15,6 +15,7 @@ type Config struct {
 
 	Server struct {
 		Addr               string `yaml:"addr"`
+		CORSAllowedOrigins string `yaml:"cors_allowed_origins"`
 		JWTAccessSecret    string `yaml:"jwt_access_secret"`
 		JWTRefreshSecret   string `yaml:"jwt_refresh_secret"`
 		JWTAccessLifetime  string `yaml:"jwt_access_lifetime"`
