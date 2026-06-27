@@ -40,6 +40,7 @@ func newUser(userSrv IUserService, cfg *config.Config) (*user, error) {
 func (u *user) registerRoutes(r chi.Router) {
 	r.Post("/users/login", u.login)
 	r.Post("/users/registration", u.registration)
+	r.Put("/users/refresh", u.refreshTokens)
 }
 
 func (u *user) registration(rw http.ResponseWriter, r *http.Request) {
@@ -53,7 +54,7 @@ func (u *user) registration(rw http.ResponseWriter, r *http.Request) {
 	access, refresh, err := u.userSrv.Registration(r.Context(), body.Username, body.Password)
 	if err != nil {
 		if err == apperrors.ErrAlreadyExist {
-			Error(rw, HTTPError{Code: http.StatusBadRequest, Message: "user already exist"})
+			Error(rw, HTTPError{Code: http.StatusConflict, Message: "user already exist"})
 			return
 		}
 
@@ -83,6 +84,27 @@ func (u *user) login(rw http.ResponseWriter, r *http.Request) {
 		}
 
 		logrus.Errorf("registration user err: %v", err)
+		Error(rw, ErrInternalServerError)
+		return
+	}
+
+	u.setCookieTokens(rw, access, refresh)
+
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (u *user) refreshTokens(rw http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	refreshToken, err := r.Cookie("refresh_token")
+	if err != nil {
+		Error(rw, ErrBadRequest)
+		return
+	}
+
+	access, refresh, err := u.userSrv.RefreshTokens(ctx, refreshToken.Value)
+	if err != nil {
+		logrus.Errorf("refresh token err: %v", err)
 		Error(rw, ErrInternalServerError)
 		return
 	}

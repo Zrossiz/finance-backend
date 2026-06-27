@@ -99,3 +99,25 @@ func (u *user) Login(ctx context.Context, username, password string) (string, st
 
 	return access, refresh, nil
 }
+
+func (u *user) RefreshTokens(ctx context.Context, refresh string) (string, string, error) {
+	claims, err := helpers.ValidateJWT(refresh, u.jwtRefreshSecret)
+	if err != nil {
+		return "", "", err
+	}
+
+	user, err := u.pgUser.GetByUsername(ctx, claims.Username)
+	if err != nil {
+		return "", "", err
+	}
+
+	access, refresh, err := helpers.GenerateTokens(
+		user, u.jwtAccessSecret, u.jwtRefreshSecret,
+		u.jwtAccessLifetime, u.jwtRefreshLifetime,
+	)
+	if err != nil {
+		return "", "", err
+	}
+
+	return access, refresh, nil
+}

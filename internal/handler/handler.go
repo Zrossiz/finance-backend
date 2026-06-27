@@ -45,6 +45,7 @@ type IRealEstateService interface {
 type IUserService interface {
 	Login(ctx context.Context, username, password string) (string, string, error)
 	Registration(ctx context.Context, username, password string) (string, string, error)
+	RefreshTokens(ctx context.Context, refresh string) (string, string, error)
 }
 
 type IBankDepositService interface {
