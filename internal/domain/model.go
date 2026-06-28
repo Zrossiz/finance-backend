@@ -8,58 +8,58 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID
-	Username  string
-	Password  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type CryptoPosition struct {
-	ID               uuid.UUID
-	UserID           uuid.UUID
-	Ticker           string
-	Amount           decimal.Decimal
-	AvgPriceUSDCents *int64
+	ID               uuid.UUID       `json:"id"`
+	UserID           uuid.UUID       `json:"user_id"`
+	Ticker           string          `json:"ticker"`
+	Amount           decimal.Decimal `json:"amount"`
+	AvgPriceUSDCents *int64          `json:"avg_price_usd_cents"`
 }
 
 type BankDeposit struct {
-	ID           uuid.UUID
-	UserID       uuid.UUID
-	Name         string
-	Currency     string
-	AmountCents  int64
-	InterestRate decimal.Decimal
-	OpenedAt     time.Time
-	ClosedAt     *time.Time
+	ID           uuid.UUID       `json:"id"`
+	UserID       uuid.UUID       `json:"user_id"`
+	Name         string          `json:"name"`
+	Currency     string          `json:"currency"`
+	AmountCents  int64           `json:"amount_cents"`
+	InterestRate decimal.Decimal `json:"interest_rate"`
+	OpenedAt     time.Time       `json:"opened_at"`
+	ClosedAt     *time.Time      `json:"closed_at"`
 }
 
 type RealEstate struct {
-	ID                 uuid.UUID
-	UserID             uuid.UUID
-	Name               string
-	Currency           string
-	PurchasePriceCents *int64
-	MonthlyIncomeCents *int64
-	Purchased          *time.Time
+	ID                 uuid.UUID  `json:"id"`
+	UserID             uuid.UUID  `json:"user_id"`
+	Name               string     `json:"name"`
+	Currency           string     `json:"currency"`
+	PurchasePriceCents *int64     `json:"purchase_price_cents"`
+	MonthlyIncomeCents *int64     `json:"monthly_income_cents"`
+	Purchased          *time.Time `json:"purchased"`
 }
 
 type Stock struct {
-	ID            uuid.UUID
-	UserID        uuid.UUID
-	Ticker        string
-	Currency      string
-	Amount        int64
-	AvgPriceCents int64
+	ID            uuid.UUID `json:"id"`
+	UserID        uuid.UUID `json:"user_id"`
+	Ticker        string    `json:"ticker"`
+	Currency      string    `json:"currency"`
+	Amount        int64     `json:"amount"`
+	AvgPriceCents int64     `json:"avg_price_cents"`
 }
 
 type Bond struct {
-	ID                 uuid.UUID
-	UserID             uuid.UUID
-	Ticker             string
-	Currency           string
-	Amount             int64
-	AvgPriceCents      int64
-	CouponCents        int64
-	CouponPeriodMonths int
+	ID                 uuid.UUID `json:"id"`
+	UserID             uuid.UUID `json:"user_id"`
+	Ticker             string    `json:"ticker"`
+	Currency           string    `json:"currency"`
+	Amount             int64     `json:"amount"`
+	AvgPriceCents      int64     `json:"avg_price_cents"`
+	CouponCents        int64     `json:"coupon_cents"`
+	CouponPeriodMonths int       `json:"coupon_period_months"`
 }
