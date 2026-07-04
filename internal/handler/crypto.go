@@ -5,6 +5,7 @@ import (
 
 	"github.com/Zrossiz/finance-backend/internal/apperrors"
 	"github.com/Zrossiz/finance-backend/internal/domain"
+	"github.com/Zrossiz/finance-backend/internal/helpers"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -40,13 +41,19 @@ func (c *cryptoPosition) getAllByUserID(rw http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	JSON(rw, http.StatusOK, positions)
+	total := c.cryptoPositionSrv.CountTotalByPositions(positions)
+	res := getUserCryptoPositionsResDTO{
+		Total:     total.String(),
+		Positions: positions,
+	}
+
+	JSON(rw, http.StatusOK, res)
 }
 
 func (c *cryptoPosition) create(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	body, err := parseJSONBody[createCryptoPositionDTO](r)
+	body, err := helpers.ParseJSONBody[createCryptoPositionDTO](r.Body)
 	if err != nil {
 		Error(rw, ErrBadRequest)
 		return
@@ -88,7 +95,7 @@ func (c *cryptoPosition) update(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := parseJSONBody[updateCryptoPositionDTO](r)
+	body, err := helpers.ParseJSONBody[updateCryptoPositionDTO](r.Body)
 	if err != nil {
 		Error(rw, ErrBadRequest)
 		return

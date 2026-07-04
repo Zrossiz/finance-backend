@@ -11,6 +11,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/Zrossiz/finance-backend/internal/api"
 	"github.com/Zrossiz/finance-backend/internal/config"
 	"github.com/Zrossiz/finance-backend/internal/handler"
 	pgrepo "github.com/Zrossiz/finance-backend/internal/repository/pg"
@@ -65,6 +66,8 @@ func New() (*App, error) {
 
 	pgRepo := pgrepo.New(app.conn)
 
+	apiSrv := api.NewAPI()
+
 	srv, err := service.New(service.Postgres{
 		User:           pgRepo.User,
 		RealEstate:     pgRepo.RealEstate,
@@ -72,6 +75,8 @@ func New() (*App, error) {
 		Bond:           pgRepo.Bond,
 		Stock:          pgRepo.Stock,
 		BankDeposit:    pgRepo.BankDeposit,
+	}, service.API{
+		CryptoRates: apiSrv.CryptoRates,
 	}, cfg)
 	if err != nil {
 		return nil, err

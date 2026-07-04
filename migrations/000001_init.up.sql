@@ -10,6 +10,7 @@ create table if not exists crypto_positions (
     id uuid primary key,
     user_id uuid not null references users(id),
     ticker varchar(255) not null,
+    coin_id varchar(255) not null,
     amount numeric(38, 18) not null,
     avg_price_usd_cents bigint
 );

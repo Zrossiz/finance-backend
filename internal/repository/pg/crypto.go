@@ -22,7 +22,7 @@ func newCryptoPosition(conn *sql.DB) *cryptoPosition {
 func (c *cryptoPosition) Create(ctx context.Context, payload domain.CryptoPosition) error {
 	_, err := c.conn.ExecContext(
 		ctx, createCryptoPositionQuery, payload.ID,
-		payload.UserID, payload.Ticker,
+		payload.UserID, payload.Ticker, payload.CoinID,
 		payload.Amount, payload.AvgPriceUSDCents,
 	)
 	if err != nil {
@@ -78,7 +78,7 @@ func (c *cryptoPosition) GetAllByUserID(
 		var position domain.CryptoPosition
 
 		err = rows.Scan(
-			&position.ID, &position.UserID,
+			&position.ID, &position.UserID, &position.CoinID,
 			&position.Ticker, &position.Amount,
 			&position.AvgPriceUSDCents,
 		)

@@ -16,7 +16,7 @@ const getUserByUsernameQuery = `
 
 const createCryptoPositionQuery = `
 	insert into crypto_positions (
-		id, user_id, ticker,
+		id, user_id, ticker, coin_id,
 		amount, avg_price_usd_cents
 	) values ($1, $2, $3, $4, $5);
 `
@@ -34,7 +34,7 @@ const updateCryptoPositionQuery = `
 
 const getUserCryptoPositionsQuery = `
 	select
-		id, user_id, ticker,
+		id, user_id, ticker, coin_id,
 		amount, avg_price_usd_cents
 	from crypto_positions
 	where user_id = $1;

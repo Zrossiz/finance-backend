@@ -6,6 +6,7 @@ import (
 
 	"github.com/Zrossiz/finance-backend/internal/apperrors"
 	"github.com/Zrossiz/finance-backend/internal/config"
+	"github.com/Zrossiz/finance-backend/internal/helpers"
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
@@ -44,7 +45,7 @@ func (u *user) registerRoutes(r chi.Router) {
 }
 
 func (u *user) registration(rw http.ResponseWriter, r *http.Request) {
-	body, err := parseJSONBody[createUserDTO](r)
+	body, err := helpers.ParseJSONBody[createUserDTO](r.Body)
 	if err != nil {
 		Error(rw, ErrBadRequest)
 		return
@@ -69,7 +70,7 @@ func (u *user) registration(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (u *user) login(rw http.ResponseWriter, r *http.Request) {
-	body, err := parseJSONBody[loginUserDTO](r)
+	body, err := helpers.ParseJSONBody[loginUserDTO](r.Body)
 	if err != nil {
 		Error(rw, ErrBadRequest)
 		return

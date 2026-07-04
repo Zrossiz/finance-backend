@@ -53,6 +53,10 @@ type IBankDepositRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.BankDeposit, error)
 }
 
+type ICryptoRatesAPI interface {
+	GetByIds(ctx context.Context, ids []string) (domain.CryptoRates, error)
+}
+
 type Service struct {
 	User           *user
 	Stock          *stock
@@ -71,7 +75,11 @@ type Postgres struct {
 	CryptoPosition ICryptoPositionRepo
 }
 
-func New(pgRepo Postgres, cfg *config.Config) (*Service, error) {
+type API struct {
+	CryptoRates ICryptoRatesAPI
+}
+
+func New(pgRepo Postgres, apiSrv API, cfg *config.Config) (*Service, error) {
 	userSrv, err := newUser(pgRepo.User, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("init user service err: %w", err)
@@ -83,6 +91,6 @@ func New(pgRepo Postgres, cfg *config.Config) (*Service, error) {
 		BankDeposit:    newBankDeposit(pgRepo.BankDeposit),
 		Bond:           newBond(pgRepo.Bond),
 		RealEstate:     newRealEstate(pgRepo.RealEstate),
-		CryptoPosition: newCryptoPosition(pgRepo.CryptoPosition),
+		CryptoPosition: newCryptoPosition(pgRepo.CryptoPosition, apiSrv.CryptoRates),
 	}, nil
 }

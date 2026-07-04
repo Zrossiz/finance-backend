@@ -1,5 +1,7 @@
 package handler
 
+import "github.com/Zrossiz/finance-backend/internal/domain"
+
 type createUserDTO struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -19,4 +21,9 @@ type createCryptoPositionDTO struct {
 type updateCryptoPositionDTO struct {
 	Amount      string `json:"amount"`
 	AvgPriceUSD *int64 `json:"avg_price_usd"`
+}
+
+type getUserCryptoPositionsResDTO struct {
+	Total     string                  `json:"total"`
+	Positions []domain.CryptoPosition `json:"positions"`
 }

@@ -19,7 +19,9 @@ type CryptoPosition struct {
 	ID               uuid.UUID       `json:"id"`
 	UserID           uuid.UUID       `json:"user_id"`
 	Ticker           string          `json:"ticker"`
+	CoinID           string          `json:"coin_id"`
 	Amount           decimal.Decimal `json:"amount"`
+	TotalPriceUSD    decimal.Decimal `json:"total_price_usd"`
 	AvgPriceUSDCents *int64          `json:"avg_price_usd_cents"`
 }
 
