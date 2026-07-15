@@ -68,6 +68,9 @@ func (b *bond) GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.B
 			&bond.Amount, &bond.AvgPriceCents,
 			&bond.CouponCents, &bond.CouponPeriodMonths,
 		)
+		if err != nil {
+			return nil, fmt.Errorf("scan bond err: %w", err)
+		}
 
 		bonds = append(bonds, bond)
 	}

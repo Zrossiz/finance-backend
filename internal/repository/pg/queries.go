@@ -204,3 +204,8 @@ const deleteBondQuery = `
 	delete from bonds
 	where id = $1;
 `
+
+const getUniqueCryptoCoinsIDs = `
+	select distinct coin_id
+	from crypto_positions;
+`

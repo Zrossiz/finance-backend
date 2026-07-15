@@ -20,7 +20,7 @@ func newCryptoRates() *cryptoRates {
 	return &cryptoRates{
 		apiURL: "https://api.coingecko.com/api/v3",
 		httpClient: &http.Client{
-			Timeout: time.Second * 3,
+			Timeout: time.Second * 5,
 		},
 	}
 }

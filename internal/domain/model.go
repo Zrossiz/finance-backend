@@ -23,6 +23,7 @@ type CryptoPosition struct {
 	Amount           decimal.Decimal `json:"amount"`
 	TotalPriceUSD    decimal.Decimal `json:"total_price_usd"`
 	AvgPriceUSDCents *int64          `json:"avg_price_usd_cents"`
+	ProfitUSD        decimal.Decimal `json:"profit_usd"`
 }
 
 type BankDeposit struct {

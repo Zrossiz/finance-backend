@@ -10,14 +10,19 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/Zrossiz/finance-backend/internal/api"
 	"github.com/Zrossiz/finance-backend/internal/config"
+	cronscheduler "github.com/Zrossiz/finance-backend/internal/cron_scheduler"
 	"github.com/Zrossiz/finance-backend/internal/handler"
+	"github.com/Zrossiz/finance-backend/internal/repository/cache"
 	pgrepo "github.com/Zrossiz/finance-backend/internal/repository/pg"
 	"github.com/Zrossiz/finance-backend/internal/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/redis/go-redis/v9"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -27,7 +32,10 @@ type App struct {
 
 	server http.Server
 
-	conn *sql.DB
+	conn    *sql.DB
+	rdbConn *redis.Client
+
+	CronScheduler *cronscheduler.CronScheduler
 
 	Context    context.Context
 	ErrGroup   *errgroup.Group
@@ -63,10 +71,19 @@ func New() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	logrus.Info("successfull postgres connect")
 
 	pgRepo := pgrepo.New(app.conn)
 
 	apiSrv := api.NewAPI()
+
+	app.rdbConn, err = cache.Connect(cfg)
+	if err != nil {
+		return nil, err
+	}
+	logrus.Info("successfull redis connect")
+
+	rdbCache := cache.New(app.rdbConn)
 
 	srv, err := service.New(service.Postgres{
 		User:           pgRepo.User,
@@ -77,6 +94,8 @@ func New() (*App, error) {
 		BankDeposit:    pgRepo.BankDeposit,
 	}, service.API{
 		CryptoRates: apiSrv.CryptoRates,
+	}, service.Cache{
+		CryptoRates: &rdbCache.CryptoRates,
 	}, cfg)
 	if err != nil {
 		return nil, err
@@ -92,11 +111,15 @@ func New() (*App, error) {
 		}
 	}
 
-	logrus.Info("allowed origins: ", allowedOrigins)
-
 	if len(allowedOrigins) == 0 {
+		if cfg.App.ENV == "prod" {
+			return nil, errors.New("CORS allowed origins are empty in production")
+		}
+
 		allowedOrigins = []string{"http://localhost:5173"}
 	}
+
+	logrus.Info("allowed origins: ", allowedOrigins)
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
@@ -121,8 +144,17 @@ func New() (*App, error) {
 	httpHandler.RegisterRoutes(r, cfg.Server.JWTAccessSecret)
 
 	app.server = http.Server{
-		Addr:    cfg.Server.Addr,
-		Handler: r,
+		Addr:              cfg.Server.Addr,
+		Handler:           r,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	err = app.StartCron(srv)
+	if err != nil {
+		return nil, err
 	}
 
 	return app, nil
@@ -130,24 +162,71 @@ func New() (*App, error) {
 
 func (a *App) Start() error {
 	logrus.Info("starting http server...")
+
 	a.ErrGroup.Go(func() error {
 		err := a.server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			return fmt.Errorf("listen and serve err: %w", err)
+			return fmt.Errorf("listen and serve: %w", err)
 		}
 
 		return nil
 	})
+
+	a.ErrGroup.Go(func() error {
+		<-a.Context.Done()
+
+		shutdownCtx, cancel := context.WithTimeout(
+			context.Background(),
+			10*time.Second,
+		)
+		defer cancel()
+
+		if err := a.server.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("shutdown http server: %w", err)
+		}
+
+		return nil
+	})
+
 	logrus.Info("http server is ready")
+
+	return nil
+}
+
+func (a *App) StartCron(srv *service.Service) error {
+	cr := cron.New()
+
+	a.CronScheduler = cronscheduler.New(cr)
+	err := a.CronScheduler.AddTask(cronscheduler.Task{
+		Name:     "refresh_crypto_rates",
+		Schedule: "* * * * *",
+		Handler:  srv.CryptoRates.RefreshCryptoRatesCache,
+	})
+	if err != nil {
+		return err
+	}
+
+	cr.Start()
+
+	logrus.Infof("cron started, total tasks: %v", len(a.CronScheduler.Tasks))
+
+	a.CronScheduler.StartOnInit(a.CronScheduler.Tasks)
 
 	return nil
 }
 
 func (a *App) Stop() error {
 	a.cancelFunc()
-	err := a.conn.Close()
-	if err != nil {
-		return err
+
+	ctx := a.CronScheduler.Stop()
+	<-ctx.Done()
+
+	if err := a.rdbConn.Close(); err != nil {
+		return fmt.Errorf("close redis: %w", err)
+	}
+
+	if err := a.conn.Close(); err != nil {
+		return fmt.Errorf("close postgres: %w", err)
 	}
 
 	return nil

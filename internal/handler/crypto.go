@@ -23,10 +23,10 @@ func newCryptoPosition(cryptoPositionSrv ICryptoPositionService) *cryptoPosition
 func (c *cryptoPosition) registerRoutes(r chi.Router, accessSecret string) {
 	r.Group(func(protected chi.Router) {
 		protected.Use(JWTAuth([]byte(accessSecret)))
-		r.Get("/cryptos", c.getAllByUserID)
-		r.Post("/cryptos", c.create)
-		r.Delete("/cryptos/{id}", c.delete)
-		r.Patch("/cryptos/{id}", c.update)
+		protected.Get("/cryptos", c.getAllByUserID)
+		protected.Post("/cryptos", c.create)
+		protected.Delete("/cryptos/{id}", c.delete)
+		protected.Put("/cryptos/{id}", c.update)
 	})
 }
 

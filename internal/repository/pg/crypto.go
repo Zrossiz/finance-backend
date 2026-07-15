@@ -78,8 +78,8 @@ func (c *cryptoPosition) GetAllByUserID(
 		var position domain.CryptoPosition
 
 		err = rows.Scan(
-			&position.ID, &position.UserID, &position.CoinID,
-			&position.Ticker, &position.Amount,
+			&position.ID, &position.UserID,
+			&position.Ticker, &position.CoinID, &position.Amount,
 			&position.AvgPriceUSDCents,
 		)
 		if err != nil {
@@ -112,4 +112,32 @@ func (c *cryptoPosition) GetOneByID(
 	}
 
 	return &position, nil
+}
+
+func (c *cryptoPosition) GetUniqueCoinIDs(ctx context.Context) ([]string, error) {
+	rows, err := c.conn.QueryContext(ctx, getUniqueCryptoCoinsIDs)
+	if err != nil {
+		return nil, fmt.Errorf("get unique coin ids db err: %w", err)
+	}
+
+	var coinIDs []string
+	for rows.Next() {
+		var coinID string
+
+		err = rows.Scan(&coinID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, apperrors.ErrNotFound
+			}
+			return nil, fmt.Errorf("scan unique coin id err: %w", err)
+		}
+
+		coinIDs = append(coinIDs, coinID)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate unique coin ids err: %w", err)
+	}
+
+	return coinIDs, nil
 }
