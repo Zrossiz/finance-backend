@@ -42,9 +42,12 @@ func (c *cryptoPosition) getAllByUserID(rw http.ResponseWriter, r *http.Request)
 	}
 
 	total := c.cryptoPositionSrv.CountTotalByPositions(positions)
+	totalProfit := c.cryptoPositionSrv.CountTotalProfitByPositions(positions)
+
 	res := getUserCryptoPositionsResDTO{
-		Total:     total.String(),
-		Positions: positions,
+		Total:       total.String(),
+		TotalProfit: totalProfit.String(),
+		Positions:   positions,
 	}
 
 	JSON(rw, http.StatusOK, res)
@@ -108,7 +111,7 @@ func (c *cryptoPosition) update(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.cryptoPositionSrv.Update(ctx, parsedUUID, parsedAmount, body.AvgPriceUSD)
+	err = c.cryptoPositionSrv.Update(ctx, parsedUUID, parsedAmount, body.AvgPriceUSDCents)
 	if err != nil {
 		if err == apperrors.ErrNotFound {
 			Error(rw, ErrNotFound)

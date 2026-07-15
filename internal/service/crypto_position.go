@@ -108,6 +108,16 @@ func (c *cryptoPosition) CountTotalByPositions(positions []domain.CryptoPosition
 	return totalUSD
 }
 
+func (c *cryptoPosition) CountTotalProfitByPositions(positions []domain.CryptoPosition) decimal.Decimal {
+	var totalUSD decimal.Decimal
+
+	for i := range positions {
+		totalUSD = totalUSD.Add(positions[i].ProfitUSD)
+	}
+
+	return totalUSD
+}
+
 func (c *cryptoPosition) GetOneByID(ctx context.Context, id uuid.UUID) (*domain.CryptoPosition, error) {
 	return c.pgCryptoPositon.GetOneByID(ctx, id)
 }
