@@ -55,3 +55,8 @@ create table if not exists bonds (
     coupon_period_months int not null,
     currency varchar(3) not null
 );
+
+create table if not exists crypto_coins (
+    id uuid primary key,
+    coin_id varchar(255) not null unique
+);

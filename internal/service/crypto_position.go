@@ -54,7 +54,7 @@ func (c *cryptoPosition) GetAllByUserID(
 	if err != nil {
 		logrus.Errorf("get cache crypto rates err: %v", err)
 
-		cryptoRates, err = c.apiCryptoRate.GetByIds(ctx, coinIDs)
+		cryptoRates, err = c.apiCryptoRate.GetByIDs(ctx, coinIDs)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (c *cryptoPosition) GetAllByUserID(
 	}
 
 	if len(cryptoRates) != len(coinIDs) {
-		cryptoRates, err = c.apiCryptoRate.GetByIds(ctx, coinIDs)
+		cryptoRates, err = c.apiCryptoRate.GetByIDs(ctx, coinIDs)
 		if err != nil {
 			return nil, err
 		}

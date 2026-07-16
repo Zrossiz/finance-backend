@@ -18,7 +18,7 @@ const createCryptoPositionQuery = `
 	insert into crypto_positions (
 		id, user_id, ticker, coin_id,
 		amount, avg_price_usd_cents
-	) values ($1, $2, $3, $4, $5);
+	) values ($1, $2, $3, $4, $5, $6);
 `
 
 const deleteCryptoPositionQuery = `
@@ -205,7 +205,11 @@ const deleteBondQuery = `
 	where id = $1;
 `
 
-const getUniqueCryptoCoinsIDs = `
+const getUniqueCryptoCoinsIDsQuery = `
 	select distinct coin_id
 	from crypto_positions;
+`
+
+const getCoinsQuery = `
+	select coin_id from crypto_coins;
 `

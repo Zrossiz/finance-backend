@@ -11,6 +11,7 @@ type Postgres struct {
 	Bond           *bond
 	BankDeposit    *bankDeposit
 	CryptoPosition *cryptoPosition
+	CryptoCoin     *cryptoCoin
 	RealEstate     *realEstate
 }
 
@@ -36,5 +37,6 @@ func New(conn *sql.DB) *Postgres {
 		CryptoPosition: newCryptoPosition(conn),
 		Bond:           newBond(conn),
 		BankDeposit:    newBankDeposit(conn),
+		CryptoCoin:     newCryptoCoin(conn),
 	}
 }

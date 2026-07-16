@@ -54,8 +54,12 @@ type IBankDepositRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.BankDeposit, error)
 }
 
+type ICryptoCoinRepo interface {
+	GetAll(ctx context.Context) ([]string, error)
+}
+
 type ICryptoRatesAPI interface {
-	GetByIds(ctx context.Context, ids []string) (domain.CryptoRates, error)
+	GetByIDs(ctx context.Context, ids []string) (domain.CryptoRates, error)
 }
 
 type ICryptoRatesCache interface {
@@ -70,6 +74,7 @@ type Postgres struct {
 	Bond           IBondRepo
 	RealEstate     IRealEstateRepo
 	CryptoPosition ICryptoPositionRepo
+	CryptoCoin     ICryptoCoinRepo
 }
 
 type API struct {
@@ -103,6 +108,6 @@ func New(pgRepo Postgres, apiSrv API, cache Cache, cfg *config.Config) (*Service
 		Bond:           newBond(pgRepo.Bond),
 		RealEstate:     newRealEstate(pgRepo.RealEstate),
 		CryptoPosition: newCryptoPosition(pgRepo.CryptoPosition, apiSrv.CryptoRates, cache.CryptoRates),
-		CryptoRates:    newCryptoRate(pgRepo.CryptoPosition, cache.CryptoRates, apiSrv.CryptoRates),
+		CryptoRates:    newCryptoRate(pgRepo.CryptoCoin, apiSrv.CryptoRates, cache.CryptoRates),
 	}, nil
 }

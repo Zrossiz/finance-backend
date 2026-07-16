@@ -115,7 +115,7 @@ func (c *cryptoPosition) GetOneByID(
 }
 
 func (c *cryptoPosition) GetUniqueCoinIDs(ctx context.Context) ([]string, error) {
-	rows, err := c.conn.QueryContext(ctx, getUniqueCryptoCoinsIDs)
+	rows, err := c.conn.QueryContext(ctx, getUniqueCryptoCoinsIDsQuery)
 	if err != nil {
 		return nil, fmt.Errorf("get unique coin ids db err: %w", err)
 	}

@@ -25,7 +25,7 @@ func newCryptoRates() *cryptoRates {
 	}
 }
 
-func (c *cryptoRates) GetByIds(ctx context.Context, ids []string) (domain.CryptoRates, error) {
+func (c *cryptoRates) GetByIDs(ctx context.Context, ids []string) (domain.CryptoRates, error) {
 	query := fmt.Sprintf(
 		"%s/simple/price?ids=%s&vs_currencies=usd",
 		c.apiURL,

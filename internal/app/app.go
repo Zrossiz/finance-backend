@@ -71,6 +71,9 @@ func New() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	app.conn.SetMaxOpenConns(20)
+	app.conn.SetMaxIdleConns(10)
+	app.conn.SetConnMaxLifetime(time.Hour)
 	logrus.Info("successfull postgres connect")
 
 	pgRepo := pgrepo.New(app.conn)
@@ -92,6 +95,7 @@ func New() (*App, error) {
 		Bond:           pgRepo.Bond,
 		Stock:          pgRepo.Stock,
 		BankDeposit:    pgRepo.BankDeposit,
+		CryptoCoin:     pgRepo.CryptoCoin,
 	}, service.API{
 		CryptoRates: apiSrv.CryptoRates,
 	}, service.Cache{
