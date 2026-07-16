@@ -137,6 +137,7 @@ func New() (*App, error) {
 		User:           srv.User,
 		RealEstate:     srv.RealEstate,
 		CryptoPosition: srv.CryptoPosition,
+		CryptoCoin:     srv.CryptoCoin,
 		Bond:           srv.Bond,
 		Stock:          srv.Stock,
 		BankDeposit:    srv.BankDeposit,

@@ -93,6 +93,7 @@ type Service struct {
 	RealEstate     *realEstate
 	CryptoPosition *cryptoPosition
 	CryptoRates    *cryptoRate
+	CryptoCoin     *cryptoCoin
 }
 
 func New(pgRepo Postgres, apiSrv API, cache Cache, cfg *config.Config) (*Service, error) {
@@ -109,5 +110,6 @@ func New(pgRepo Postgres, apiSrv API, cache Cache, cfg *config.Config) (*Service
 		RealEstate:     newRealEstate(pgRepo.RealEstate),
 		CryptoPosition: newCryptoPosition(pgRepo.CryptoPosition, apiSrv.CryptoRates, cache.CryptoRates),
 		CryptoRates:    newCryptoRate(pgRepo.CryptoCoin, apiSrv.CryptoRates, cache.CryptoRates),
+		CryptoCoin:     newCryptoCoin(pgRepo.CryptoCoin),
 	}, nil
 }

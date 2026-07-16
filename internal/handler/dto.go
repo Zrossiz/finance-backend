@@ -28,3 +28,7 @@ type getUserCryptoPositionsResDTO struct {
 	TotalProfit string                  `json:"total_profit"`
 	Positions   []domain.CryptoPosition `json:"positions"`
 }
+
+type getCryptoCoinsResDTO struct {
+	Coins []string `json:"coins"`
+}

@@ -57,6 +57,10 @@ type IBankDepositService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.BankDeposit, error)
 }
 
+type ICryptoCoinService interface {
+	GetAll(ctx context.Context) ([]string, error)
+}
+
 type Service struct {
 	User           IUserService
 	Stock          IStockService
@@ -64,11 +68,13 @@ type Service struct {
 	Bond           IBondService
 	RealEstate     IRealEstateService
 	CryptoPosition ICryptoPositionService
+	CryptoCoin     ICryptoCoinService
 }
 
 type Handler struct {
 	user           *user
 	cryptoPosition *cryptoPosition
+	cryptoCoin     *cryptoCoin
 }
 
 func New(srv Service, cfg *config.Config) (*Handler, error) {
@@ -80,6 +86,7 @@ func New(srv Service, cfg *config.Config) (*Handler, error) {
 	return &Handler{
 		user:           userHandler,
 		cryptoPosition: newCryptoPosition(srv.CryptoPosition),
+		cryptoCoin:     newCryptoCoin(srv.CryptoCoin),
 	}, nil
 }
 
@@ -87,5 +94,6 @@ func (h *Handler) RegisterRoutes(router chi.Router, accessSecret string) {
 	router.Route("/api/v1", func(r chi.Router) {
 		h.user.registerRoutes(r)
 		h.cryptoPosition.registerRoutes(r, accessSecret)
+		h.cryptoCoin.registerRoutes(r)
 	})
 }
