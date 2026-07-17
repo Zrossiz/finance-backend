@@ -1,6 +1,10 @@
 package service
 
-import "context"
+import (
+	"context"
+
+	"github.com/Zrossiz/finance-backend/internal/domain"
+)
 
 type cryptoCoin struct {
 	pgCryptoCoin ICryptoCoinRepo
@@ -12,6 +16,6 @@ func newCryptoCoin(pgCryptoCoin ICryptoCoinRepo) *cryptoCoin {
 	}
 }
 
-func (c *cryptoCoin) GetAll(ctx context.Context) ([]string, error) {
+func (c *cryptoCoin) GetAll(ctx context.Context) ([]domain.CryptoCoin, error) {
 	return c.pgCryptoCoin.GetAll(ctx)
 }

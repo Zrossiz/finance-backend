@@ -15,6 +15,7 @@ type loginUserDTO struct {
 type createCryptoPositionDTO struct {
 	Ticker           string `json:"ticker"`
 	Amount           string `json:"amount"`
+	CoinID           string `json:"coin_id"`
 	AvgPriceUSDCents *int64 `json:"avg_price_usd_cents"`
 }
 
@@ -30,5 +31,5 @@ type getUserCryptoPositionsResDTO struct {
 }
 
 type getCryptoCoinsResDTO struct {
-	Coins []string `json:"coins"`
+	Coins []domain.CryptoCoin `json:"coins"`
 }

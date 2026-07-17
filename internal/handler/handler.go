@@ -58,7 +58,7 @@ type IBankDepositService interface {
 }
 
 type ICryptoCoinService interface {
-	GetAll(ctx context.Context) ([]string, error)
+	GetAll(ctx context.Context) ([]domain.CryptoCoin, error)
 }
 
 type Service struct {

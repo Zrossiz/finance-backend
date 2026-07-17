@@ -76,6 +76,7 @@ func (c *cryptoPosition) create(rw http.ResponseWriter, r *http.Request) {
 		Ticker:           body.Ticker,
 		Amount:           amountDecimal,
 		AvgPriceUSDCents: body.AvgPriceUSDCents,
+		CoinID:           body.CoinID,
 	}
 
 	err = c.cryptoPositionSrv.Create(ctx, cryptoPosition)

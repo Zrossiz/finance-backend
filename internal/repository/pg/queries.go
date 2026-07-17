@@ -211,5 +211,5 @@ const getUniqueCryptoCoinsIDsQuery = `
 `
 
 const getCoinsQuery = `
-	select coin_id from crypto_coins;
+	select coin_id, symbol from crypto_coins;
 `

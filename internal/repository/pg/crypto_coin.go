@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/Zrossiz/finance-backend/internal/domain"
 )
 
 type cryptoCoin struct {
@@ -14,16 +16,16 @@ func newCryptoCoin(conn *sql.DB) *cryptoCoin {
 	return &cryptoCoin{conn: conn}
 }
 
-func (c *cryptoCoin) GetAll(ctx context.Context) ([]string, error) {
+func (c *cryptoCoin) GetAll(ctx context.Context) ([]domain.CryptoCoin, error) {
 	rows, err := c.conn.QueryContext(ctx, getCoinsQuery)
 	if err != nil {
 		return nil, fmt.Errorf("get crypto coins db err: %w", err)
 	}
 
-	var coins []string
+	var coins []domain.CryptoCoin
 	for rows.Next() {
-		var coin string
-		err = rows.Scan(&coin)
+		var coin domain.CryptoCoin
+		err = rows.Scan(&coin.CoinID, &coin.Symbol)
 		if err != nil {
 			return nil, fmt.Errorf("scan crypto coins err: %w", err)
 		}

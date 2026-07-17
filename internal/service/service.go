@@ -55,7 +55,7 @@ type IBankDepositRepo interface {
 }
 
 type ICryptoCoinRepo interface {
-	GetAll(ctx context.Context) ([]string, error)
+	GetAll(ctx context.Context) ([]domain.CryptoCoin, error)
 }
 
 type ICryptoRatesAPI interface {

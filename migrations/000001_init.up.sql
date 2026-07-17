@@ -6,11 +6,15 @@ create table if not exists users (
     updated_at timestamp default now()
 );
 
+create table if not exists crypto_coins (
+    coin_id varchar(255) primary key,
+    symbol varchar(50) not null
+);
+
 create table if not exists crypto_positions (
     id uuid primary key,
     user_id uuid not null references users(id),
-    ticker varchar(255) not null,
-    coin_id varchar(255) not null,
+    coin_id varchar(255) not null references crypto_coins(coin_id),
     amount numeric(38, 18) not null,
     avg_price_usd_cents bigint
 );
@@ -54,9 +58,4 @@ create table if not exists bonds (
     coupon_cents bigint not null,
     coupon_period_months int not null,
     currency varchar(3) not null
-);
-
-create table if not exists crypto_coins (
-    id uuid primary key,
-    coin_id varchar(255) not null unique
 );

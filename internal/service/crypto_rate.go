@@ -28,10 +28,15 @@ func (c *cryptoRate) RefreshCryptoRatesCache() {
 	logrus.Info("starting RefreshCryptoRatesCache cron job...")
 	ctx := context.Background()
 
-	coinIDs, err := c.pgCryptoCoin.GetAll(ctx)
+	coins, err := c.pgCryptoCoin.GetAll(ctx)
 	if err != nil {
 		logrus.Errorf("cron get crypto coin ids err: %v", err)
 		return
+	}
+
+	coinIDs := make([]string, len(coins))
+	for i, v := range coins {
+		coinIDs[i] = v.Symbol
 	}
 
 	cryptoRates, err := c.apiCryptoRates.GetByIDs(ctx, coinIDs)

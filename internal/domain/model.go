@@ -66,3 +66,8 @@ type Bond struct {
 	CouponCents        int64     `json:"coupon_cents"`
 	CouponPeriodMonths int       `json:"coupon_period_months"`
 }
+
+type CryptoCoin struct {
+	Symbol string `json:"symbol"`
+	CoinID string `json:"coin_id"`
+}
