@@ -24,7 +24,7 @@ func (b *bankDeposit) registerRoutes(r chi.Router, accessSecret string) {
 		protected.Use(JWTAuth([]byte(accessSecret)))
 		protected.Get("/bank-deposit", b.getAllByUserID)
 		protected.Post("/bank-deposit", b.create)
-		protected.Delete("/bank-deposit", b.delete)
+		protected.Delete("/bank-deposit/{id}", b.delete)
 	})
 }
 

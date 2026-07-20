@@ -46,3 +46,19 @@ type createBankDepositDTO struct {
 	OpenedAt     time.Time `json:"opened_at"`
 	PeriodMonths int       `json:"period_months"`
 }
+
+type createRealEstateDTO struct {
+	Name               string     `json:"name"`
+	Currency           string     `json:"currency"`
+	PurchasePriceCents *int64     `json:"purchase_price_cents"`
+	MonthlyIncomeCents *int64     `json:"monthly_income_cents"`
+	Purchased          *time.Time `json:"purchased"`
+}
+
+type updateRealEstateDTO struct {
+	Name               string     `json:"name"`
+	Currency           string     `json:"currency"`
+	PurchasePriceCents *int64     `json:"purchase_price_cents"`
+	MonthlyIncomeCents *int64     `json:"monthly_income_cents"`
+	Purchased          *time.Time `json:"purchased"`
+}
