@@ -55,6 +55,7 @@ type IBankDepositService interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.BankDeposit, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.BankDeposit, error)
+	CalculateTotalIncomeCents(amountCents int64, period int, interestRate decimal.Decimal) int64
 }
 
 type ICryptoCoinService interface {

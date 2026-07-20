@@ -79,15 +79,21 @@ func (b *bankDeposit) create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	totalIncomeCents := b.bankDepositSrv.CalculateTotalIncomeCents(
+		body.AmountCents,
+		body.PeriodMonths,
+		interestRateDecimal)
+
 	bankDeposit := domain.BankDeposit{
-		ID:           uuid.New(),
-		UserID:       userClaims.UserID,
-		Name:         body.Name,
-		Currency:     body.Currency,
-		AmountCents:  body.AmountCents,
-		OpenedAt:     body.OpenedAt,
-		PeriodMonths: body.PeriodMonths,
-		InterestRate: interestRateDecimal,
+		ID:               uuid.New(),
+		UserID:           userClaims.UserID,
+		Name:             body.Name,
+		Currency:         body.Currency,
+		AmountCents:      body.AmountCents,
+		TotalIncomeCents: totalIncomeCents,
+		OpenedAt:         body.OpenedAt,
+		PeriodMonths:     body.PeriodMonths,
+		InterestRate:     interestRateDecimal,
 	}
 
 	err = b.bankDepositSrv.Create(ctx, bankDeposit)

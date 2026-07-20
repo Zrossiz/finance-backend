@@ -27,14 +27,16 @@ type CryptoPosition struct {
 }
 
 type BankDeposit struct {
-	ID           uuid.UUID       `json:"id"`
-	UserID       uuid.UUID       `json:"user_id"`
-	Name         string          `json:"name"`
-	Currency     string          `json:"currency"`
-	AmountCents  int64           `json:"amount_cents"`
-	InterestRate decimal.Decimal `json:"interest_rate"`
-	OpenedAt     time.Time       `json:"opened_at"`
-	PeriodMonths int             `json:"period_months"`
+	ID                  uuid.UUID       `json:"id"`
+	UserID              uuid.UUID       `json:"user_id"`
+	Name                string          `json:"name"`
+	Currency            string          `json:"currency"`
+	AmountCents         int64           `json:"amount_cents"`
+	TotalIncomeCents    int64           `json:"total_income_cents"`
+	IncomeCentsPerMonth int64           `json:"income_cents_per_month"`
+	InterestRate        decimal.Decimal `json:"interest_rate"`
+	OpenedAt            time.Time       `json:"opened_at"`
+	PeriodMonths        int             `json:"period_months"`
 }
 
 type RealEstate struct {
