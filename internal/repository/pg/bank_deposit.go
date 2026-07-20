@@ -23,7 +23,7 @@ func (b *bankDeposit) Create(ctx context.Context, payload domain.BankDeposit) er
 		ctx, createBankDepositQuery, payload.ID,
 		payload.UserID, payload.Name, payload.Currency,
 		payload.AmountCents, payload.InterestRate,
-		payload.OpenedAt, payload.ClosedAt,
+		payload.OpenedAt, payload.PeriodMonths,
 	)
 	if err != nil {
 		return fmt.Errorf("create bank deposit db err: %w", err)
@@ -40,7 +40,7 @@ func (b *bankDeposit) GetByID(ctx context.Context, id uuid.UUID) (*domain.BankDe
 		&deposit.ID, &deposit.UserID,
 		&deposit.Name, &deposit.Currency,
 		&deposit.AmountCents, &deposit.InterestRate,
-		&deposit.OpenedAt, &deposit.ClosedAt,
+		&deposit.OpenedAt, &deposit.PeriodMonths,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -78,7 +78,7 @@ func (b *bankDeposit) GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]d
 			&deposit.ID, &deposit.UserID,
 			&deposit.Name, &deposit.Currency,
 			&deposit.AmountCents, &deposit.InterestRate,
-			&deposit.OpenedAt, &deposit.ClosedAt,
+			&deposit.OpenedAt, &deposit.PeriodMonths,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("scan bank deposit err: %w", err)

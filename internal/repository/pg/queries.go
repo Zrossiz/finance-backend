@@ -52,7 +52,7 @@ const createBankDepositQuery = `
 	insert into bank_deposits (
 		id, user_id, name,
 		currency, amount_cents,
-		interest_rate, opened_at, closed_at
+		interest_rate, opened_at, period_months
 	)
 	values ($1, $2, $3, $4, $5, $6, $7, $8)
 `
@@ -66,7 +66,7 @@ const getBankDepositByIDQuery = `
 	select
 		id, user_id, name,
 		currency, amount_cents, interest_rate,
-		opened_at, closed_at
+		opened_at, period_months
 	from bank_deposits
 	where id = $1
 `
@@ -76,7 +76,7 @@ const getUserBankDepositsQuery = `
 		id, user_id,
 		name, currency,
 		amount_cents, interest_rate,
-		opened_at, closed_at
+		opened_at, period_months
 	from bank_deposits
 	where user_id = $1
 	order by opened_at desc

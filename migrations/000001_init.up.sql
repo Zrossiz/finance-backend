@@ -27,7 +27,7 @@ create table if not exists bank_deposits (
     amount_cents bigint not null,
     interest_rate numeric(6, 3) not null,
     opened_at timestamp not null,
-    closed_at timestamp
+    period_months int not null
 );
 
 create table if not exists real_estates (

@@ -75,6 +75,7 @@ type Handler struct {
 	user           *user
 	cryptoPosition *cryptoPosition
 	cryptoCoin     *cryptoCoin
+	bankDeposit    *bankDeposit
 }
 
 func New(srv Service, cfg *config.Config) (*Handler, error) {
@@ -87,13 +88,15 @@ func New(srv Service, cfg *config.Config) (*Handler, error) {
 		user:           userHandler,
 		cryptoPosition: newCryptoPosition(srv.CryptoPosition),
 		cryptoCoin:     newCryptoCoin(srv.CryptoCoin),
+		bankDeposit:    newBankDeposit(srv.BankDeposit),
 	}, nil
 }
 
 func (h *Handler) RegisterRoutes(router chi.Router, accessSecret string) {
 	router.Route("/api/v1", func(r chi.Router) {
 		h.user.registerRoutes(r)
-		h.cryptoPosition.registerRoutes(r, accessSecret)
 		h.cryptoCoin.registerRoutes(r)
+		h.bankDeposit.registerRoutes(r, accessSecret)
+		h.cryptoPosition.registerRoutes(r, accessSecret)
 	})
 }

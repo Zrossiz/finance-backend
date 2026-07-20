@@ -34,7 +34,7 @@ type BankDeposit struct {
 	AmountCents  int64           `json:"amount_cents"`
 	InterestRate decimal.Decimal `json:"interest_rate"`
 	OpenedAt     time.Time       `json:"opened_at"`
-	ClosedAt     *time.Time      `json:"closed_at"`
+	PeriodMonths int             `json:"period_months"`
 }
 
 type RealEstate struct {

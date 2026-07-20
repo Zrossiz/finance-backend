@@ -1,6 +1,10 @@
 package handler
 
-import "github.com/Zrossiz/finance-backend/internal/domain"
+import (
+	"time"
+
+	"github.com/Zrossiz/finance-backend/internal/domain"
+)
 
 type createUserDTO struct {
 	Username string `json:"username"`
@@ -32,4 +36,13 @@ type getUserCryptoPositionsResDTO struct {
 
 type getCryptoCoinsResDTO struct {
 	Coins []domain.CryptoCoin `json:"coins"`
+}
+
+type createBankDepositDTO struct {
+	Name         string    `json:"name"`
+	Currency     string    `json:"currency"`
+	AmountCents  int64     `json:"amount_cents"`
+	InterestRate string    `json:"interest_rate"`
+	OpenedAt     time.Time `json:"opened_at"`
+	PeriodMonths int       `json:"period_months"`
 }

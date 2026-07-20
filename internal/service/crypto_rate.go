@@ -36,7 +36,7 @@ func (c *cryptoRate) RefreshCryptoRatesCache() {
 
 	coinIDs := make([]string, len(coins))
 	for i, v := range coins {
-		coinIDs[i] = v.Symbol
+		coinIDs[i] = v.CoinID
 	}
 
 	cryptoRates, err := c.apiCryptoRates.GetByIDs(ctx, coinIDs)
